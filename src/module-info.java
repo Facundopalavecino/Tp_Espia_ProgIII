@@ -4,5 +4,5 @@
 /**
  * 
  */
-module Tp_Espia {
+module Espias {
 }
