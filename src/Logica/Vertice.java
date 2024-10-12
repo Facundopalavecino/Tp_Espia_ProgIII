@@ -14,7 +14,7 @@ public class Vertice {
 		this.vecinos = new ArrayList<Integer>();
 	}
 	
-	public String getNombre() {
+	public String obtenerNombre() {
 		return nombre;
 	}
 	

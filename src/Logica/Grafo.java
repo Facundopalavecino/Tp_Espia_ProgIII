@@ -7,8 +7,8 @@ public class Grafo {
 	private HashMap<Integer, Vertice> vertices;
 	private HashMap<Integer, Arista> aristas;
 	private String mensaje;
-	private int idUltimoVertice = 1;
-	private int idUltimaArista = 1;
+	private int idUltimoVertice = 0;
+	private int idUltimaArista = 0;
 
 	
 	public Grafo(String mensaje) {
@@ -81,12 +81,22 @@ public class Grafo {
 		Vertice origen = obtenerVertice(idOrigen);
 		Vertice destino = obtenerVertice(idDestino);
 		
-		Arista arista = new Arista(origen, destino, peso);
+		// Verificamos que ambos vértices existen
+	    if (origen == null || destino == null) {
+	        System.out.println("Error: Uno de los vértices no existe. Origen: " + idOrigen + ", Destino: " + idDestino);
+	        return; // No agregamos la arista si los vértices no existen
+	    }
 		
-		aristas.put(idUltimaArista, arista);
-		idUltimaArista++;
+	    // Si ambos existen, agregamos la arista en ambas direcciones
+	    Arista arista1 = new Arista(origen, destino, peso);
+	    Arista arista2 = new Arista(destino, origen, peso);  // Segunda arista en sentido inverso
+
+	    aristas.put(idUltimaArista++, arista1);  // Agregamos la arista origen -> destino
+	    aristas.put(idUltimaArista++, arista2);  // Agregamos la arista destino -> origen
+
+	    System.out.println("Se agrego arista (" + origen.obtenerId() + " => " + destino.obtenerId() + ") con peso: " + peso);
+	    System.out.println("Se agrego arista (" + destino.obtenerId() + " => " + origen.obtenerId() + ") con peso: " + peso);
 		
-		System.out.println("Se agrego arista (" + origen.obtenerId() + " => " + destino.obtenerId() + ") con peso: " + peso );
 	}
 	
 	public void eliminarArista(int idArista) {				
@@ -101,7 +111,7 @@ public class Grafo {
 		System.out.println("Grafo: ");
 		for (int i = 1; i < idUltimoVertice; i++) {
 			if (vertices.containsKey(i)) {
-				System.out.println("Vertice " + vertices.get(i).obtenerId() + ": " + vertices.get(i).getNombre());
+				System.out.println("Vertice " + vertices.get(i).obtenerId() + ": " + vertices.get(i).obtenerNombre());
 			}
 		}
 	}
