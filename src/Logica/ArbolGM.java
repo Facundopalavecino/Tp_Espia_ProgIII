@@ -40,7 +40,6 @@ public class ArbolGM {
 	    		union(origen, destino);
 	    		aristasGeneradas.add(arista);
                 aristasSeleccionadas++;
-	    		System.out.println("Union del origen " + origen + " y de destino " + destino + ". Cantidad de Aristas = " + aristasSeleccionadas);
 	    		
                 if (aristasSeleccionadas == grafo.totalVertices() - 1) {
                     break;
@@ -82,13 +81,11 @@ public class ArbolGM {
         visitados.add(espiaInicial);
         agregarAristasNoVisitadas(espiaInicial, aristas, visitados);
 
-        // Ejecutar el algoritmo de Prim
         while (!aristas.isEmpty() && visitados.size() < vertices.size()) {
         	Arista aristaMin = aristas.poll();
         	Vertice origen = aristaMin.obtenerOrigen();
         	Vertice destino = aristaMin.obtenerDestino();
 
-            // Determinar cuál de los espías de la arista no ha sido visitado
             if (!verticeYaVisitado(origen, visitados) || !verticeYaVisitado(destino, visitados)) {
 	    		aristasGeneradas.add(aristaMin);
                 Vertice verticeNoVisitado = verticeYaVisitado(origen, visitados) ? destino : origen;
@@ -98,41 +95,21 @@ public class ArbolGM {
         }
 	 }
 
-	    // Método para verificar si un espía ha sido visitado
-	    private boolean verticeYaVisitado(Vertice vertice, Set<Vertice> visitados) {
-	        return visitados.contains(vertice);
-	    }
+    private boolean verticeYaVisitado(Vertice vertice, Set<Vertice> visitados) {
+        return visitados.contains(vertice);
+    }
 
-	    // Método para agregar las aristas de un espía no visitado a la cola de prioridad
-	    private void agregarAristasNoVisitadas(Vertice vertice, PriorityQueue<Arista> aristas, Set<Vertice> visitados) {
-	        for (Arista arista : grafo.obtenerAristas()) {
-	        	Vertice vecino = arista.obtenerOrigen().equals(vertice) ? arista.obtenerDestino() : arista.obtenerOrigen();
-	            if (!visitados.contains(vecino)) {
-	                aristas.add(arista);
-	            }
-	        }
-	    }
+    // Método para agregar las aristas de un espía no visitado a la cola de prioridad
+    private void agregarAristasNoVisitadas(Vertice vertice, PriorityQueue<Arista> aristas, Set<Vertice> visitados) {
+        for (Arista arista : grafo.obtenerAristas()) {
+        	Vertice vecino = arista.obtenerOrigen().equals(vertice) ? arista.obtenerDestino() : arista.obtenerOrigen();
+            if (!visitados.contains(vecino)) {
+                aristas.add(arista);
+            }
+        }
+    }
 	
-	// VISUALIZACION
-	public void mostrarArbolGeneradoDetallado() {
-	    System.out.println("Árbol Generador Mínimo generado por Kruskal (detallado):");
-		System.out.println("---------------------------------------------------------");
-	    ArrayList<String> conexiones = new ArrayList<>();
-
-	    for (Arista arista : aristasGeneradas) {
-	        double peso = arista.obtenerPeso();
-	        
-	        String conexion =  arista.obtenerOrigen().obtenerNombre() + " --(" + (peso * 100) + "%)--> " + arista.obtenerDestino().obtenerNombre();
-	        conexiones.add(conexion);
-	    }
-
-	    for (String conexion : conexiones) {
-	        System.out.println(conexion);
-	    }
-	    
-	    System.out.println("\nEstructura de los padres de cada nodo:");
-	    for (int i = 0; i < padres.length; i++) {
-	        System.out.println("Nodo " + i + " -> Padre: " + padres[i]);
-	    }
+	public ArrayList<Arista> obtenerAristasGeneradas() {
+	    return aristasGeneradas;
 	}
 }

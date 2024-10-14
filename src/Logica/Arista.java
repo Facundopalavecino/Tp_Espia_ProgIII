@@ -15,7 +15,7 @@ public class Arista implements Comparable<Arista>{
 		if(peso >= 0 && peso <= 100) {
 			this.peso = peso / 100.0;			
 		}else {
-			throw new IllegalArgumentException("El peso debe estar entre 0 y 100");
+			throw new NumberFormatException("El peso debe estar entre 0 y 100");
 		}
 		
 		origen.agregarVecino(destino.obtenerId());
