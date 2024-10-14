@@ -1,12 +1,14 @@
 package Logica;
 
-public class Arista {
+public class Arista implements Comparable<Arista>{
+	private int id;
 	private String conexion;
 	private Vertice origen;
 	private Vertice destino;
 	private double peso;
 
-	public Arista(Vertice origen, Vertice destino, double peso) {
+	public Arista(int id, Vertice origen, Vertice destino, double peso) {
+		this.id = id;
 		this.conexion = origen.obtenerId() + "-" + destino.obtenerId();
 		this.origen = origen;
 		this.destino = destino;
@@ -49,4 +51,10 @@ public class Arista {
 	public String obtenerConexion() {
 		return conexion;
 	}
+	
+    // Implementación de la interfaz Comparable
+    @Override
+    public int compareTo(Arista otraArista) {
+        return Double.compare(this.peso, otraArista.peso);
+    }
 }

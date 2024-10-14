@@ -1,11 +1,9 @@
 package Logica;
 
-import java.util.HashMap;
-
 public class Main {
 
 	public static void main(String[] args) {
-		Grafo grafo = new Grafo("Mensaje para enviar");
+		Grafo grafo = new Grafo("Mensaje para enviar", 9);
 		grafo.agregarVertice("Espia Jorge"); 	// 1
 		grafo.agregarVertice("Espia Nacho"); 	// 2
 		grafo.agregarVertice("Espia Damian"); 	// 3
@@ -37,9 +35,12 @@ public class Main {
 		grafo.agregarArista(6, 8,  20);		
 		System.out.println("---------------------------------------------------------");
 		ArbolGM arbolK = new ArbolGM(grafo);
-		arbolK.algoritmoKruskal();
-		System.out.println("-----------------------DETALLADO-------------------------");
+		arbolK.calcularKruskal();
 		arbolK.mostrarArbolGeneradoDetallado();
+		System.out.println("---------------------------------------------------------");		
+		ArbolGM arbolP = new ArbolGM(grafo);
+		arbolP.calcularPrim();
+		arbolP.mostrarArbolGeneradoDetallado();
 		System.out.println("---------------------------------------------------------");
 				
 	}
