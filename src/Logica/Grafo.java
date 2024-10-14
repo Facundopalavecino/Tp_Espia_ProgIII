@@ -2,6 +2,8 @@ package Logica;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Grafo {
 	private HashSet<Vertice> vertices;
@@ -21,6 +23,9 @@ public class Grafo {
 		return mensaje;
 	}
 
+	public int cantidadVertices() {
+		return vertices.size();
+	}
 	
 	// VERTICES
 	public Vertice obtenerVertice(int id) {
@@ -35,7 +40,7 @@ public class Grafo {
 	public void agregarVertice(String nombre) {
 			if(nombreRepetido(nombre)) {
 				throw new IllegalArgumentException("Ya existe un vertice con el mismo nombre.");
-			}else {
+			} else {
 				Vertice vertice = new Vertice(idUltimoVertice, nombre);
 				vertices.add(vertice);
 				idUltimoVertice++;			
@@ -44,23 +49,27 @@ public class Grafo {
 	}
 	
 	public void eliminarVertice(int id) {
-		if(vertices.contains(id)) {
-			ArrayList<Integer> vecinos = obtenerVertice(id).obtenerVecinos();
-			Arista aristaAEliminar = new Arista();
-			
-	        for (int vecino : vecinos) {
-	        	
-	        	aristaAEliminar = obtenerArista(id, vecino);
-				if (aristaAEliminar.existeConexion(id, vecino)) {
-					aristas.remove(aristaAEliminar);
-				}
+		for(Vertice vertice : vertices) {
+			if(vertice.obtenerId() == id) {
+				ArrayList<Integer> vecinos = vertice.obtenerVecinos();
+				Arista aristaAEliminar = new Arista();
 				
-				aristaAEliminar = obtenerArista(vecino, id);
-				if (aristaAEliminar.existeConexion(vecino, id)) {
-					aristas.remove(aristaAEliminar);
+				for (int vecino : vecinos) {
+					
+					aristaAEliminar = obtenerArista(id, vecino);
+					if (aristaAEliminar != null && aristaAEliminar.existeConexion(id, vecino)) {
+						aristas.remove(aristaAEliminar);
+					}
+					
+					aristaAEliminar = obtenerArista(vecino, id);
+					if (aristaAEliminar != null && aristaAEliminar.existeConexion(vecino, id)) {
+						aristas.remove(aristaAEliminar);
+					}
 				}
-	        }
-			vertices.remove(id);
+				vertices.remove(vertice);
+				idUltimoVertice--;
+				break;
+			}
 		}
 	}
 	
@@ -82,6 +91,26 @@ public class Grafo {
 		return aristas;
 	}
 	
+	public void agregarArista(Vertice origen, Vertice destino, double peso) {
+		try {			
+			// Verificamos que ambos vértices existen
+		    if ((origen == null || destino == null)) {
+		        return;
+		    }
+		    
+		    Arista arista1 = new Arista(idUltimaArista, origen, destino, peso);
+		    idUltimaArista++;
+		    Arista arista2 = new Arista(idUltimaArista, destino, origen, peso); 
+		    idUltimaArista ++;
+	
+		    aristas.add(arista1);  // origen -> destino
+		    aristas.add(arista2);  // destino -> origen
+		 } catch (NumberFormatException e) {
+            throw new NumberFormatException("Error al crear la arista: " + e.getMessage());
+        }
+	    		
+	}
+	
 	public void agregarArista(int idOrigen, int idDestino, double peso) {
 		try {
 			Vertice origen = obtenerVertice(idOrigen);
@@ -101,14 +130,20 @@ public class Grafo {
 		    aristas.add(arista2);  // destino -> origen
 		 } catch (NumberFormatException e) {
             throw new NumberFormatException("Error al crear la arista: " + e.getMessage());
-        }
-	    		
+        }	
 	}
 	
-	public void eliminarArista(int idArista) {				
-		if(aristas.contains(idArista)) {
-            aristas.remove(idArista);
-        }
+	public void eliminarArista(Vertice origen, Vertice destino) {	
+		int idOrigen = origen.obtenerId();
+		int idDestino = destino.obtenerId();
+		
+		for(Arista arista : aristas) {
+			if(arista.existeConexion(idOrigen, idDestino)) {
+				aristas.remove(arista);
+				idUltimaArista--;
+				break;
+			}			
+		}
 	}
 	
 	// VERIFICACIONES

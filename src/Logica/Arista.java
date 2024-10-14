@@ -12,9 +12,9 @@ public class Arista implements Comparable<Arista>{
 		this.conexion = origen.obtenerId() + "-" + destino.obtenerId();
 		this.origen = origen;
 		this.destino = destino;
-		if(peso >= 0 && peso <= 100) {
+		if(peso > 0 && peso <= 100) {
 			this.peso = peso / 100.0;			
-		}else {
+		}else{
 			throw new NumberFormatException("El peso debe estar entre 0 y 100");
 		}
 		
@@ -29,7 +29,7 @@ public class Arista implements Comparable<Arista>{
 	}
 	
 	public double obtenerPeso() {
-		return peso;
+		return peso*100;
 	}
 	
 	public void setPeso(int peso) {
@@ -50,6 +50,10 @@ public class Arista implements Comparable<Arista>{
 
 	public String obtenerConexion() {
 		return conexion;
+	}
+	
+	public int obtenerId() {
+		return id;
 	}
 	
     // Implementación de la interfaz Comparable

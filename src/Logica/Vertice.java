@@ -10,7 +10,11 @@ public class Vertice {
 	
 	public Vertice(int id, String nombre) {
 		this.id = id;
-		this.nombre = nombre;
+		if(!nombre.equals("")) {
+			this.nombre = nombre;			
+		}else {
+			throw new IllegalArgumentException("El nombre del vertice no puede estar vacio");
+		}
 		this.vecinos = new ArrayList<Integer>();
 	}
 	
