@@ -13,15 +13,19 @@ public class ArbolGM {
 	private Grafo grafo;
 	private ArrayList<Arista> aristasGeneradas;
 	private int padres[]; 
+	private double tiempoEjecutado;
 			
 	public ArbolGM(Grafo grafo) {
 		this.grafo = grafo;
 		this.aristasGeneradas = new ArrayList<Arista>();
 		this.padres = new int[grafo.totalVertices()];
+		this.tiempoEjecutado = 0;
 	}
 	
 	// --------------------------------   KRUSKAL ---------------------------------------------
 	public void calcularKruskal() {		
+		long inicio = System.nanoTime();
+		
 	    for (int j = 0; j < grafo.totalVertices(); j++) {
 	        padres[j] = j;
 	    }
@@ -46,6 +50,12 @@ public class ArbolGM {
                 }
 	    	}
 	    }
+	    
+
+	    long fin = System.nanoTime();
+	    long tiempoEjecucion = fin - inicio;
+	    tiempoEjecutado = tiempoEjecucion / 1_000_000.0;
+
 	}
 	
 	public int find(int vertice) {
@@ -70,29 +80,38 @@ public class ArbolGM {
 	
 	
 	// ---------------------------------------- PRIM ------------------------------------
-	 public void calcularPrim() {
-        Set<Vertice> visitados = new HashSet<>();
-        PriorityQueue<Arista> aristas = new PriorityQueue<>();
+	public void calcularPrim() {
+		long inicio = System.nanoTime();
+		
+		Set<Vertice> visitados = new HashSet<>();
+		PriorityQueue<Arista> aristas = new PriorityQueue<>();
 
-        HashSet<Vertice> vertices = grafo.obtenerVertices();
-        
-        // Seleccionar un vértice inicial arbitrario
-        Vertice espiaInicial = vertices.iterator().next();
-        visitados.add(espiaInicial);
-        agregarAristasNoVisitadas(espiaInicial, aristas, visitados);
+		// Seleccionar un vértice inicial arbitrario
+		Vertice espiaInicial = grafo.obtenerVertices().iterator().next();
+		visitados.add(espiaInicial);
+		agregarAristasNoVisitadas(espiaInicial, aristas, visitados);
+		
+		while (!aristas.isEmpty() && visitados.size() < grafo.totalVertices()) {
+		    Arista aristaMin = aristas.poll();
+		    Vertice origen = aristaMin.obtenerOrigen();
+		    Vertice destino = aristaMin.obtenerDestino();
+		
+		    // Solo se agrega la arista si conecta un vértice visitado con uno no visitado
+		    if (visitados.contains(origen) && !visitados.contains(destino)) {
+		        aristasGeneradas.add(aristaMin);
+		        visitados.add(destino);
+		        agregarAristasNoVisitadas(destino, aristas, visitados);
+		    } else if (visitados.contains(destino) && !visitados.contains(origen)) {
+		        aristasGeneradas.add(aristaMin);
+		        visitados.add(origen);
+		        agregarAristasNoVisitadas(origen, aristas, visitados);
+		    }
+		}
+	    
+	    long fin = System.nanoTime();
+	    long tiempoEjecucion = fin - inicio;
+	    tiempoEjecutado = tiempoEjecucion / 1_000_000.0;
 
-        while (!aristas.isEmpty() && visitados.size() < vertices.size()) {
-        	Arista aristaMin = aristas.poll();
-        	Vertice origen = aristaMin.obtenerOrigen();
-        	Vertice destino = aristaMin.obtenerDestino();
-
-            if (!verticeYaVisitado(origen, visitados) || !verticeYaVisitado(destino, visitados)) {
-	    		aristasGeneradas.add(aristaMin);
-                Vertice verticeNoVisitado = verticeYaVisitado(origen, visitados) ? destino : origen;
-                visitados.add(verticeNoVisitado);
-                agregarAristasNoVisitadas(verticeNoVisitado, aristas, visitados);
-            }
-        }
 	 }
 
     private boolean verticeYaVisitado(Vertice vertice, Set<Vertice> visitados) {
@@ -101,15 +120,21 @@ public class ArbolGM {
 
     // Método para agregar las aristas de un espía no visitado a la cola de prioridad
     private void agregarAristasNoVisitadas(Vertice vertice, PriorityQueue<Arista> aristas, Set<Vertice> visitados) {
-        for (Arista arista : grafo.obtenerAristas()) {
-        	Vertice vecino = arista.obtenerOrigen().equals(vertice) ? arista.obtenerDestino() : arista.obtenerOrigen();
-            if (!visitados.contains(vecino)) {
-                aristas.add(arista);
-            }
-        }
-    }
+	    for (Arista arista : grafo.obtenerAristas()) {
+	        Vertice vecino = arista.obtenerOrigen().equals(vertice) ? arista.obtenerDestino() : arista.obtenerOrigen();
+	        // Solo agrega aristas que conecten a un vecino no visitado
+	        if (!visitados.contains(vecino)) {
+	            aristas.add(arista);
+	        }
+	    }
+	}
 	
 	public ArrayList<Arista> obtenerAristasGeneradas() {
 	    return aristasGeneradas;
 	}
+
+	public double obtenerTiempoEjecutado() {
+		return tiempoEjecutado;
+	}
+
 }

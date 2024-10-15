@@ -13,7 +13,8 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 200);
         setLayout(null);
-
+        setLocationRelativeTo(null); 
+        
         JButton btnIniciar = new JButton("Iniciar");
         btnIniciar.setBounds(140, 60, 100, 30);
         add(btnIniciar);

@@ -9,20 +9,28 @@ public class AGMFrame extends JFrame {
     private ArrayList<Arista> aristas;
     private ArrayList<Point> posiciones;
     private ArrayList<String> nombres; // Para almacenar los nombres de los vértices
+    private String titulo;
 
-    public AGMFrame(ArrayList<Arista> aristas, ArrayList<Point> posiciones, ArrayList<String> nombres) {
+
+    public AGMFrame(ArrayList<Arista> aristas, ArrayList<Point> posiciones, ArrayList<String> nombres, String titulo, Double tiempoEjecutado) {
         this.aristas = aristas;
         this.posiciones = posiciones;
         this.nombres = nombres; // Almacena los nombres de los espías
+        this.titulo = titulo;
+
 
         setTitle("Árbol Generador Mínimo");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(800, 600);
+        setSize(1280, 720);
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
-        JLabel lblMensaje = new JLabel("Grafo del Árbol Generador Mínimo", JLabel.CENTER);
+        JLabel lblMensaje = new JLabel("Grafo del Árbol Generador Mínimo por algoritmo de " + titulo, JLabel.CENTER);
         add(lblMensaje, BorderLayout.NORTH);
 
+        JLabel lblTiempo = new JLabel("Tiempo ejecutado: " + tiempoEjecutado + "ms", SwingConstants.CENTER);
+        add(lblTiempo, BorderLayout.SOUTH);
+        
         JPanel panelAGM = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {

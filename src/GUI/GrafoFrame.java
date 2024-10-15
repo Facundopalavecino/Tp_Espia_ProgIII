@@ -24,8 +24,9 @@ public class GrafoFrame extends JFrame {
         this.grafo = grafo;
         setTitle("Grafo de Espías");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(1280, 720);
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
         lineas = new ArrayList<>();
         btnVertices = new ArrayList<>();
@@ -64,8 +65,8 @@ public class GrafoFrame extends JFrame {
         JPanel panelBotones = new JPanel();
 
         
-        JButton btnSeleccionarAristas = new JButton("Crear Aristas");
-        JButton btnAgregarVertices = new JButton("Crear Vertices");
+        JButton btnSeleccionarAristas = new JButton("Crear camino entre espias");
+        JButton btnAgregarVertices = new JButton("Crear Espia");
         
         // Agrego aristas
         btnSeleccionarAristas.addActionListener(new ActionListener() {
@@ -94,10 +95,19 @@ public class GrafoFrame extends JFrame {
     		}
         });
 
-        JButton btnAGM = new JButton("AGM");
-        btnAGM.addActionListener(new ActionListener() {
+     // Botón para Kruskal
+        JButton btnKruskal = new JButton("Kruskal");
+        btnKruskal.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ejecutarAlgoritmoKruskal();
+            }
+        });
+        
+        // Botón para Prim
+        JButton btnPrim = new JButton("Prim");
+        btnPrim.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ejecutarAlgoritmoPrim();
             }
         });
         
@@ -124,7 +134,8 @@ public class GrafoFrame extends JFrame {
 
         panelBotones.add(btnAgregarVertices);
         panelBotones.add(btnSeleccionarAristas);
-        panelBotones.add(btnAGM);
+        panelBotones.add(btnKruskal);
+        panelBotones.add(btnPrim);
         panelBotones.add(btnBorrarGrafo);
         panelBotones.add(btnDeshacer);
         panelBotones.add(btnRehacer);
@@ -171,7 +182,7 @@ public class GrafoFrame extends JFrame {
 	        } else {
 	            int verticeSeleccionado2 = verticeId;
 	            if(grafo.verificarAristas(verticeSeleccionado1, verticeSeleccionado2)) {
-	            	throw new Exception("Ya existe una arista entre estos dos vértices");
+	            	throw new Exception("Ya existe un camino entre estos dos espias");
 	            }
 	            btnVertices.get(verticeSeleccionado1).setBackground(null);
 	            agregarArista(verticeSeleccionado1, verticeSeleccionado2);
@@ -185,7 +196,7 @@ public class GrafoFrame extends JFrame {
     private void agregarArista(int v1, int v2) {
         if (v1 != v2) {
         	try {
-        		String pesoStr = JOptionPane.showInputDialog("Ingrese el peso de la arista entre " + 
+        		String pesoStr = JOptionPane.showInputDialog("Ingrese la probabilidad de interceptar el mensaje entre los espías " +
                 grafo.obtenerVertice(v1).obtenerNombre() + " y " + 
                 grafo.obtenerVertice(v2).obtenerNombre() + ":");
         		
@@ -228,7 +239,7 @@ public class GrafoFrame extends JFrame {
 	        ArrayList<String> nombresEspias = grafo.nombres();
 	
 	        // Crear y mostrar el AGMFrame
-	        new AGMFrame(aristasAGM, posiciones, nombresEspias).setVisible(true);
+	        new AGMFrame(aristasAGM, posiciones, nombresEspias, "Kruskal", arbolGM.obtenerTiempoEjecutado()).setVisible(true);
 	        
 	    	} else {
 	    		throw new Exception("No hay vertices para generar el AGM");
@@ -236,6 +247,28 @@ public class GrafoFrame extends JFrame {
     	} catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     	}
+    }
+    
+    private void ejecutarAlgoritmoPrim() {
+        try {
+            if (grafo.cantidadVertices() > 0) {
+                ArbolGM arbolGM = new ArbolGM(grafo);
+                arbolGM.calcularPrim();
+
+                // Obtener las aristas generadas
+                ArrayList<Arista> aristasAGM = arbolGM.obtenerAristasGeneradas();
+
+                // Obtener los nombres de los vértices
+                ArrayList<String> nombresEspias = grafo.nombres();
+
+                // Crear y mostrar el AGMFrame
+                new AGMFrame(aristasAGM, posiciones, nombresEspias, "Prim", arbolGM.obtenerTiempoEjecutado()).setVisible(true);
+            } else {
+                throw new Exception("No hay vertices para generar el AGM");
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     private void borrarGrafo() {    	
@@ -283,7 +316,7 @@ public class GrafoFrame extends JFrame {
                     rehacerVertice(ultimaAccion.obtenerBotonVertice(), ultimaAccion.obtenerVertice());
                     break;
                 case AGREGAR_ARISTA:
-                    grafo.agregarArista(ultimaAccion.obtenerArista().obtenerOrigen(), ultimaAccion.obtenerArista().obtenerDestino(), ultimaAccion.obtenerArista().obtenerPeso());
+                    grafo.agregarArista(ultimaAccion.obtenerArista().obtenerOrigen(), ultimaAccion.obtenerArista().obtenerDestino(), ultimaAccion.obtenerArista().obtenerPeso()*100);
                     rehacerArista(ultimaAccion.obtenerArista());
                     break;
             }
