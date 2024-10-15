@@ -1,19 +1,21 @@
 package Logica;
 
-public class Arista {
+public class Arista implements Comparable<Arista>{
+	private int id;
 	private String conexion;
 	private Vertice origen;
 	private Vertice destino;
 	private double peso;
 
-	public Arista(Vertice origen, Vertice destino, double peso) {
+	public Arista(int id, Vertice origen, Vertice destino, double peso) {
+		this.id = id;
 		this.conexion = origen.obtenerId() + "-" + destino.obtenerId();
 		this.origen = origen;
 		this.destino = destino;
-		if(peso >= 0 && peso <= 100) {
+		if(peso > 0 && peso <= 100) {
 			this.peso = peso / 100.0;			
-		}else {
-			throw new IllegalArgumentException("El peso debe estar entre 0 y 100");
+		}else{
+			throw new NumberFormatException("El peso debe estar entre 0 y 100");
 		}
 		
 		origen.agregarVecino(destino.obtenerId());
@@ -27,7 +29,7 @@ public class Arista {
 	}
 	
 	public double obtenerPeso() {
-		return peso;
+		return peso*100;
 	}
 	
 	public void setPeso(int peso) {
@@ -49,4 +51,14 @@ public class Arista {
 	public String obtenerConexion() {
 		return conexion;
 	}
+	
+	public int obtenerId() {
+		return id;
+	}
+	
+    // Implementación de la interfaz Comparable
+    @Override
+    public int compareTo(Arista otraArista) {
+        return Double.compare(this.peso, otraArista.peso);
+    }
 }

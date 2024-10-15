@@ -37,9 +37,10 @@ public class Main {
 		grafo.agregarArista(6, 8,  20);		
 		System.out.println("---------------------------------------------------------");
 		ArbolGM arbolK = new ArbolGM(grafo);
-		arbolK.algoritmoKruskal();
+		//arbolK.calcularKruskal();
+		arbolK.calcularPrim();
 		System.out.println("-----------------------DETALLADO-------------------------");
-		arbolK.mostrarArbolGeneradoDetallado();
+		//arbolK.mostrarArbolGeneradoDetallado();
 		System.out.println("---------------------------------------------------------");
 				
 	}

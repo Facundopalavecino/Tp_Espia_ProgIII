@@ -1,19 +1,21 @@
 package Logica;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Grafo {
-	private HashMap<Integer, Vertice> vertices;
-	private HashMap<Integer, Arista> aristas;
+	private HashSet<Vertice> vertices;
+	private HashSet<Arista> aristas;
 	private String mensaje;
 	private int idUltimoVertice = 0;
 	private int idUltimaArista = 0;
 
 	
 	public Grafo(String mensaje) {
-		this.vertices = new HashMap<Integer, Vertice>() ;
-		this.aristas = new HashMap<Integer, Arista>();
+		this.vertices = new HashSet<Vertice>() ;
+		this.aristas = new HashSet<Arista>();
 		this.mensaje = mensaje;
 	}
 	
@@ -21,51 +23,63 @@ public class Grafo {
 		return mensaje;
 	}
 
+	public int cantidadVertices() {
+		return vertices.size();
+	}
 	
 	// VERTICES
 	public Vertice obtenerVertice(int id) {
-		return vertices.get(id);
-	}
+		for(Vertice vertice : vertices) {
+			if(vertice.obtenerId() == id) {
+				return vertice;
+			}
+		}
+		return null;
+}
 	
 	public void agregarVertice(String nombre) {
-		Vertice vertice = new Vertice(idUltimoVertice, nombre);
-		vertices.put(idUltimoVertice, vertice);
-		idUltimoVertice++;
-		
-		System.out.println("Se agrego vertice nro. " + vertice.obtenerId() + " con nombre: " + nombre );
+			if(nombreRepetido(nombre)) {
+				throw new IllegalArgumentException("Ya existe un vertice con el mismo nombre.");
+			} else {
+				Vertice vertice = new Vertice(idUltimoVertice, nombre);
+				vertices.add(vertice);
+				idUltimoVertice++;			
+			}
+
 	}
 	
 	public void eliminarVertice(int id) {
-		if(vertices.containsKey(id)) {
-			ArrayList<Integer> vecinos = vertices.get(id).obtenerVecinos();
-			Arista aristaAEliminar = new Arista();
-			
-	        for (int vecino : vecinos) {
-	        	
-	        	aristaAEliminar = obtenerArista(id, vecino);
-				if (aristaAEliminar.existeConexion(id, vecino)) {
-					
-					aristas.remove(aristaAEliminar);
-					System.out.println("Se elimino arista (" + id + " => " + vecino + ")");
-				}
+		for(Vertice vertice : vertices) {
+			if(vertice.obtenerId() == id) {
+				ArrayList<Integer> vecinos = vertice.obtenerVecinos();
+				Arista aristaAEliminar = new Arista();
 				
-				aristaAEliminar = obtenerArista(vecino, id);
-				if (aristaAEliminar.existeConexion(vecino, id)) {
+				for (int vecino : vecinos) {
 					
-					aristas.remove(vecino + "-" + id);
-					System.out.println("Se elimino arista (" + vecino + " => " + id + ")");
+					aristaAEliminar = obtenerArista(id, vecino);
+					if (aristaAEliminar != null && aristaAEliminar.existeConexion(id, vecino)) {
+						aristas.remove(aristaAEliminar);
+					}
+					
+					aristaAEliminar = obtenerArista(vecino, id);
+					if (aristaAEliminar != null && aristaAEliminar.existeConexion(vecino, id)) {
+						aristas.remove(aristaAEliminar);
+					}
 				}
-	        }
-			vertices.remove(id);
-			
-			System.out.println("Se elimino vertice nro. " + id);
+				vertices.remove(vertice);
+				idUltimoVertice--;
+				break;
+			}
 		}
 	}
 	
+	public HashSet<Vertice> obtenerVertices() {
+		return vertices;
+	}
 	
 	// ARISTAS
 	public Arista obtenerArista(int origen, int destino) {		
-		for(Arista arista : aristas.values()) {
+		for(Arista arista : aristas) {
 			if(arista.existeConexion(origen, destino)) {
 				return arista;
 			}
@@ -73,57 +87,85 @@ public class Grafo {
 		return null;
 	}
 	
-	public HashMap<Integer, Arista> obtenerAristas() {
+	public HashSet<Arista> obtenerAristas() {
 		return aristas;
 	}
 	
-	public void agregarArista(int idOrigen, int idDestino, double peso) {
-		Vertice origen = obtenerVertice(idOrigen);
-		Vertice destino = obtenerVertice(idDestino);
-		
-		// Verificamos que ambos vértices existen
-	    if (origen == null || destino == null) {
-	        System.out.println("Error: Uno de los vértices no existe. Origen: " + idOrigen + ", Destino: " + idDestino);
-	        return; // No agregamos la arista si los vértices no existen
-	    }
-		
-	    // Si ambos existen, agregamos la arista en ambas direcciones
-	    Arista arista1 = new Arista(origen, destino, peso);
-	    Arista arista2 = new Arista(destino, origen, peso);  // Segunda arista en sentido inverso
-
-	    aristas.put(idUltimaArista++, arista1);  // Agregamos la arista origen -> destino
-	    aristas.put(idUltimaArista++, arista2);  // Agregamos la arista destino -> origen
-
-	    System.out.println("Se agrego arista (" + origen.obtenerId() + " => " + destino.obtenerId() + ") con peso: " + peso);
-	    System.out.println("Se agrego arista (" + destino.obtenerId() + " => " + origen.obtenerId() + ") con peso: " + peso);
-		
-	}
+	public void agregarArista(Vertice origen, Vertice destino, double peso) {
+		try {			
+			// Verificamos que ambos vértices existen
+		    if ((origen == null || destino == null)) {
+		        return;
+		    }
+		    
+		    Arista arista1 = new Arista(idUltimaArista, origen, destino, peso);
+		    idUltimaArista++;
+		    Arista arista2 = new Arista(idUltimaArista, destino, origen, peso); 
+		    idUltimaArista ++;
 	
-	public void eliminarArista(int idArista) {				
-		if(aristas.containsKey(idArista)) {
-            aristas.remove(idArista);
-            System.out.println("Se elimino arista id: " + idArista);
+		    aristas.add(arista1);  // origen -> destino
+		    aristas.add(arista2);  // destino -> origen
+		 } catch (NumberFormatException e) {
+            throw new NumberFormatException("Error al crear la arista: " + e.getMessage());
         }
+	    		
 	}
 	
-	// VISUALIZACION
-	public void mostrarGrafo() {
-		System.out.println("Grafo: ");
-		for (int i = 1; i < idUltimoVertice; i++) {
-			if (vertices.containsKey(i)) {
-				System.out.println("Vertice " + vertices.get(i).obtenerId() + ": " + vertices.get(i).obtenerNombre());
+	public void agregarArista(int idOrigen, int idDestino, double peso) {
+		try {
+			Vertice origen = obtenerVertice(idOrigen);
+			Vertice destino = obtenerVertice(idDestino);
+			
+			// Verificamos que ambos vértices existen
+		    if ((origen == null || destino == null)) {
+		        return;
+		    }
+		    
+		    Arista arista1 = new Arista(idUltimaArista, origen, destino, peso);
+		    idUltimaArista++;
+		    Arista arista2 = new Arista(idUltimaArista, destino, origen, peso); 
+		    idUltimaArista ++;
+	
+		    aristas.add(arista1);  // origen -> destino
+		    aristas.add(arista2);  // destino -> origen
+		 } catch (NumberFormatException e) {
+            throw new NumberFormatException("Error al crear la arista: " + e.getMessage());
+        }	
+	}
+	
+	public void eliminarArista(Vertice origen, Vertice destino) {	
+		int idOrigen = origen.obtenerId();
+		int idDestino = destino.obtenerId();
+		
+		for(Arista arista : aristas) {
+			if(arista.existeConexion(idOrigen, idDestino)) {
+				aristas.remove(arista);
+				idUltimaArista--;
+				break;
+			}			
+		}
+	}
+	
+	// VERIFICACIONES
+	public boolean verificarAristas(int origen, int destino) {
+		for(Arista arista : aristas) {
+			if(arista.existeConexion(origen, destino)) {
+				return true;
 			}
 		}
+		return false;
 	}
 	
-	public void mostrarArista(int idOrigen, int idDestino) {
-		try {
-			Arista arista = obtenerArista(idOrigen, idDestino);
-			System.out.println("Arista (" + idOrigen + " => " + idDestino + ") con peso: " + arista.obtenerPeso());			
-		} catch (Exception e) {
-			System.out.println(e.getMessage() + " (" + idOrigen + "," + idDestino + ")");
+	public boolean nombreRepetido(String nombre) {
+		for(Vertice vertice : vertices) {
+			String nombre1 = vertice.obtenerNombre().toLowerCase();
+			if(nombre1.equals(nombre.toLowerCase())) {
+				return true;
+			}
 		}
+		return false;
 	}
+	
 	public ArrayList<String> nombres(){
 		ArrayList<String> resultado = new ArrayList<String>();
 		for (int i = 0; i < totalVertices(); i++) {
@@ -131,10 +173,16 @@ public class Grafo {
         }
 		return resultado;
 	}
-	
+		
 	// TOTALES
 	public int totalVertices() {
 		return vertices.size();
 	}
 	
+	// BORRAR TODO
+	public void borrar() {
+        // Limpiar los vértices y aristas
+        this.vertices.clear();
+        this.aristas.clear();
+    }
 }

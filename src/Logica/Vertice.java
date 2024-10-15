@@ -10,7 +10,11 @@ public class Vertice {
 	
 	public Vertice(int id, String nombre) {
 		this.id = id;
-		this.nombre = nombre;
+		if(!nombre.equals("")) {
+			this.nombre = nombre;			
+		}else {
+			throw new IllegalArgumentException("El nombre del vertice no puede estar vacio");
+		}
 		this.vecinos = new ArrayList<Integer>();
 	}
 	
@@ -40,5 +44,9 @@ public class Vertice {
         for (int vecino : vecinos) {
             System.out.println(vecino);
         }
+	}
+	
+	public boolean equals(String nombre) {
+		return nombre.equals(nombre);
 	}
 }
