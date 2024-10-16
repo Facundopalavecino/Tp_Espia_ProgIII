@@ -146,27 +146,29 @@ public class GrafoFrame extends JFrame {
     private void agregarEspia(Point posicion) {
     	try {				
 	        String nombre = JOptionPane.showInputDialog("Ingrese el nombre del espía:");
-            grafo.agregarVertice(nombre);
-
-            JButton btnVertice = new JButton(nombre);
-            btnVertice.setBounds(posicion.x - 40, posicion.y - 15, 80, 30);
-            btnVertice.setEnabled(false); // Deshabilitado inicialmente
-            final int verticeId = btnVertices.size();
-
-            pilaDeshacer.push(new Accion(Accion.TipoAccion.AGREGAR_VERTICE, grafo.obtenerVertice(verticeId), btnVertice));
-            
-            btnVertice.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (habilitarAristas) {
-                        seleccionarVertice(verticeId);
-                    }
-                }
-            });
-
-            panelGrafo.add(btnVertice);
-            btnVertices.add(btnVertice);
-            posiciones.add(posicion);
-            panelGrafo.repaint();
+	        if (nombre != null && !nombre.trim().isEmpty()) {
+	            grafo.agregarVertice(nombre);
+	
+	            JButton btnVertice = new JButton(nombre);
+	            btnVertice.setBounds(posicion.x - 40, posicion.y - 15, 80, 30);
+	            btnVertice.setEnabled(false); // Deshabilitado inicialmente
+	            final int verticeId = btnVertices.size();
+	
+	            pilaDeshacer.push(new Accion(Accion.TipoAccion.AGREGAR_VERTICE, grafo.obtenerVertice(verticeId), btnVertice));
+	            
+	            btnVertice.addActionListener(new ActionListener() {
+	                public void actionPerformed(ActionEvent e) {
+	                    if (habilitarAristas) {
+	                        seleccionarVertice(verticeId);
+	                    }
+	                }
+	            });
+	
+	            panelGrafo.add(btnVertice);
+	            btnVertices.add(btnVertice);
+	            posiciones.add(posicion);
+	            panelGrafo.repaint();
+	        }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -178,7 +180,7 @@ public class GrafoFrame extends JFrame {
     	try {
 	        if (verticeSeleccionado1 == -1) {
 	            verticeSeleccionado1 = verticeId;
-	            btnVertices.get(verticeId).setBackground(Color.YELLOW);
+	            btnVertices.get(verticeId).setBackground(Color.LIGHT_GRAY);
 	        } else {
 	            int verticeSeleccionado2 = verticeId;
 	            if(grafo.verificarAristas(verticeSeleccionado1, verticeSeleccionado2)) {
@@ -199,8 +201,7 @@ public class GrafoFrame extends JFrame {
         		String pesoStr = JOptionPane.showInputDialog("Ingrese la probabilidad de interceptar el mensaje entre los espías " +
                 grafo.obtenerVertice(v1).obtenerNombre() + " y " + 
                 grafo.obtenerVertice(v2).obtenerNombre() + ":");
-        		
-        		if (!pesoStr.isEmpty()) {
+        		if (pesoStr != null && !pesoStr.isEmpty()) {
 	                double peso = Double.parseDouble(pesoStr);
 	                grafo.agregarArista(v1, v2, peso);
 	
@@ -232,13 +233,9 @@ public class GrafoFrame extends JFrame {
 	        ArbolGM arbolGM = new ArbolGM(grafo);
 	        arbolGM.calcularKruskal();
 	
-	        // Obtener las aristas generadas
 	        ArrayList<Arista> aristasAGM = arbolGM.obtenerAristasGeneradas();
-	        
-	        // Obtener los nombres de los vértices
 	        ArrayList<String> nombresEspias = grafo.nombres();
 	
-	        // Crear y mostrar el AGMFrame
 	        new AGMFrame(aristasAGM, posiciones, nombresEspias, "Kruskal", arbolGM.obtenerTiempoEjecutado()).setVisible(true);
 	        
 	    	} else {
@@ -255,14 +252,11 @@ public class GrafoFrame extends JFrame {
                 ArbolGM arbolGM = new ArbolGM(grafo);
                 arbolGM.calcularPrim();
 
-                // Obtener las aristas generadas
                 ArrayList<Arista> aristasAGM = arbolGM.obtenerAristasGeneradas();
-
-                // Obtener los nombres de los vértices
                 ArrayList<String> nombresEspias = grafo.nombres();
-
-                // Crear y mostrar el AGMFrame
+                
                 new AGMFrame(aristasAGM, posiciones, nombresEspias, "Prim", arbolGM.obtenerTiempoEjecutado()).setVisible(true);
+                
             } else {
                 throw new Exception("No hay vertices para generar el AGM");
             }
@@ -275,9 +269,11 @@ public class GrafoFrame extends JFrame {
         panelGrafo.removeAll();
         panelGrafo.repaint(); 
         lineas.clear();
+        btnVertices.clear();
+        posiciones.clear();
         pilaDeshacer.clear();
         pilaRehacer.clear();
-        grafo.borrar();
+        grafo = new Grafo("Mensaje");
     }
 
     public void deshacerUltimaAccion() {
@@ -307,7 +303,6 @@ public class GrafoFrame extends JFrame {
         if (!pilaRehacer.isEmpty()) {
             Accion ultimaAccion = pilaRehacer.pop();
 
-            // Mover la acción rehecha a la pila de deshacer
             pilaDeshacer.push(ultimaAccion);
 
             switch (ultimaAccion.obtenerTipo()) {

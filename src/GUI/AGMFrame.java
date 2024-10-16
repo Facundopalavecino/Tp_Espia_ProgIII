@@ -28,7 +28,7 @@ public class AGMFrame extends JFrame {
         JLabel lblMensaje = new JLabel("Grafo del Árbol Generador Mínimo por algoritmo de " + titulo, JLabel.CENTER);
         add(lblMensaje, BorderLayout.NORTH);
 
-        JLabel lblTiempo = new JLabel("Tiempo ejecutado: " + tiempoEjecutado + "ms", SwingConstants.CENTER);
+        JLabel lblTiempo = new JLabel("Tiempo ejecutado: " + tiempoEjecutado + "s", SwingConstants.CENTER);
         add(lblTiempo, BorderLayout.SOUTH);
         
         JPanel panelAGM = new JPanel() {

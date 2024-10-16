@@ -46,8 +46,8 @@ public class Vertice {
         }
 	}
 	
-	public boolean equals(String nombre) {
-		return nombre.equals(nombre);
+	public boolean equals(String nombre2) {
+		return nombre.equals(nombre2);
 	}
 	
 }

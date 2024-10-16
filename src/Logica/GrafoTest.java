@@ -46,7 +46,7 @@ class GrafoTest {
 
     @Test
     void testAgregarArista() {
-        grafo.agregarArista(0, 1, 60);
+        grafo.agregarArista(0, 1, 0.6);
         HashSet<Arista> aristas = grafo.obtenerAristas();
 
         assertEquals(2, aristas.size(), "Debería haber 2 aristas después de agregar una arista bidireccional");
@@ -56,7 +56,7 @@ class GrafoTest {
 
     @Test
     void testEliminarArista() {
-        grafo.agregarArista(1, 2, 60);
+        grafo.agregarArista(1, 2, 0.6);
         grafo.eliminarArista(vertice1, vertice2);
 
         HashSet<Arista> aristas = grafo.obtenerAristas();
@@ -67,7 +67,7 @@ class GrafoTest {
     void testVerificarAristas() {
         assertFalse(grafo.verificarAristas(0, 1), "No debería haber una arista entre 1 y 2 inicialmente");
 
-        grafo.agregarArista(0, 1, 60);
+        grafo.agregarArista(0, 1, 0.6);
         assertTrue(grafo.verificarAristas(0, 1), "Debería existir una arista entre 1 y 2 después de agregarla");
     }
 
@@ -81,7 +81,7 @@ class GrafoTest {
     @Test
     void testBorrar() {
         grafo.agregarVertice("Espía 3");
-        grafo.agregarArista(1, 2, 50);
+        grafo.agregarArista(1, 2, 0.5);
         grafo.borrar();
 
         assertEquals(0, grafo.totalVertices(), "Debería haber 0 vértices después de borrar el grafo");

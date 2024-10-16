@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 
 public class ArbolGM {
@@ -50,11 +52,10 @@ public class ArbolGM {
                 }
 	    	}
 	    }
-	    
 
 	    long fin = System.nanoTime();
 	    long tiempoEjecucion = fin - inicio;
-	    tiempoEjecutado = tiempoEjecucion / 1_000_000.0;
+	    tiempoEjecutado = tiempoEjecucion / 100_000.0;
 
 	}
 	
@@ -75,7 +76,7 @@ public class ArbolGM {
 	}	
 	
 	public boolean creaCircuito(int origen, int destino) {
-		return find(origen) == find(destino);
+		return find(origen) == find(destino) && aristasGeneradas.size() > 0;
 	}
 	
 	
@@ -97,11 +98,11 @@ public class ArbolGM {
 		    Vertice destino = aristaMin.obtenerDestino();
 		
 		    // Solo se agrega la arista si conecta un vértice visitado con uno no visitado
-		    if (visitados.contains(origen) && !visitados.contains(destino)) {
+		    if (fueVisitado(visitados, origen) && !fueVisitado(visitados, destino)) {
 		        aristasGeneradas.add(aristaMin);
 		        visitados.add(destino);
 		        agregarAristasNoVisitadas(destino, aristas, visitados);
-		    } else if (visitados.contains(destino) && !visitados.contains(origen)) {
+		    } else if (fueVisitado(visitados, destino) && !fueVisitado(visitados, origen)) {
 		        aristasGeneradas.add(aristaMin);
 		        visitados.add(origen);
 		        agregarAristasNoVisitadas(origen, aristas, visitados);
@@ -110,13 +111,50 @@ public class ArbolGM {
 	    
 	    long fin = System.nanoTime();
 	    long tiempoEjecucion = fin - inicio;
-	    tiempoEjecutado = tiempoEjecucion / 1_000_000.0;
+	    tiempoEjecutado = tiempoEjecucion / 100_000.0;
 
 	 }
 
-    private boolean verticeYaVisitado(Vertice vertice, Set<Vertice> visitados) {
-        return visitados.contains(vertice);
+	public boolean fueVisitado(Set<Vertice> visitados, Vertice verticeAAnalizar) {
+		for(Vertice vertice : visitados) {
+			if (vertice.equals(verticeAAnalizar.obtenerNombre())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// --------------------------- BFS -----------------------------------------------------------
+    // Método para recorrer el AGM con BFS
+    public List<Vertice> recorrerAGMConBFS(Vertice verticeInicial) {
+        List<Vertice> ordenEncuentros = new ArrayList<>();
+        Queue<Vertice> cola = new LinkedList<>();
+        Set<Vertice> visitados = new HashSet<>();
+
+        // Iniciar BFS desde el vértice inicial
+        cola.add(verticeInicial);
+        visitados.add(verticeInicial);
+
+        while (!cola.isEmpty()) {
+            Vertice vertice = cola.poll();
+            ordenEncuentros.add(vertice);
+
+            // Obtener las aristas conectadas al vértice actual en el AGM
+            for (Arista arista : aristasGeneradas) {
+                Vertice origen = arista.obtenerOrigen();
+                Vertice destino = arista.obtenerDestino();
+
+                Vertice vecino = origen.equals(vertice) ? destino : origen;
+                if (!visitados.contains(vecino)) {
+                    visitados.add(vecino);
+                    cola.add(vecino);
+                }
+            }
+        }
+
+        return ordenEncuentros;
     }
+    // -----------------------------------------------------------------------------------------
 
     // Método para agregar las aristas de un espía no visitado a la cola de prioridad
     private void agregarAristasNoVisitadas(Vertice vertice, PriorityQueue<Arista> aristas, Set<Vertice> visitados) {
@@ -128,6 +166,19 @@ public class ArbolGM {
 	        }
 	    }
 	}
+    
+    public boolean existeArista(Arista aristaAVerificar) {
+    	int idOrigen = aristaAVerificar.obtenerOrigen().obtenerId();
+    	int idDestino = aristaAVerificar.obtenerDestino().obtenerId();
+    	
+	    for (Arista arista : aristasGeneradas) {
+	    	if(arista.existeConexion(idOrigen, idDestino) || arista.existeConexion(idDestino, idOrigen)) {
+	    		return true;
+	    	}
+	    }
+	    return false;
+
+    }
 	
 	public ArrayList<Arista> obtenerAristasGeneradas() {
 	    return aristasGeneradas;

@@ -181,9 +181,10 @@ public class Grafo {
 	
 	// BORRAR TODO
 	public void borrar() {
-        // Limpiar los vértices y aristas
         this.vertices.clear();
         this.aristas.clear();
+        idUltimaArista = 0;
+        idUltimoVertice = 0;
     }
 	
 }

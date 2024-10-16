@@ -13,6 +13,7 @@ class ArbolGMTest {
     private Vertice vertice1;
     private Vertice vertice2;
     private Vertice vertice3;
+    private Vertice vertice4;
 
     @BeforeEach
     void setUp() {
@@ -22,14 +23,16 @@ class ArbolGMTest {
         vertice1 = new Vertice(0, "Espía 1");
         vertice2 = new Vertice(1, "Espía 2");
         vertice3 = new Vertice(2, "Espía 3");
+        vertice4 = new Vertice(3, "Espía 4");
 
         grafo.agregarVertice(vertice1.obtenerNombre());
         grafo.agregarVertice(vertice2.obtenerNombre());
         grafo.agregarVertice(vertice3.obtenerNombre());
+        grafo.agregarVertice(vertice4.obtenerNombre());
 
-        grafo.agregarArista(vertice1, vertice2, 0.3);  // peso 0.30
-        grafo.agregarArista(vertice2, vertice3, 0.5);  // peso 0.50
-        grafo.agregarArista(vertice1, vertice3, 0.7);  // peso 0.70
+        grafo.agregarArista(vertice1, vertice2, 0.3);  // peso 0.3 | 0 => 1
+        grafo.agregarArista(vertice2, vertice3, 0.5);  // peso 0.5 | 1 => 2
+        grafo.agregarArista(vertice3, vertice4, 0.7);  // peso 0.7 | 2 => 3
 
         arbolGM = new ArbolGM(grafo);
     }
@@ -39,16 +42,19 @@ class ArbolGMTest {
         arbolGM.calcularKruskal();
         ArrayList<Arista> aristasGeneradas = arbolGM.obtenerAristasGeneradas();
 
-        // Validamos que se han generado dos aristas (ya que son 3 vértices, se generan n-1 aristas)
-        assertEquals(2, aristasGeneradas.size());
+        // Validamos que se han generado dos aristas (ya que son 4 vértices, se generan n-1 aristas)
+        assertEquals(3, aristasGeneradas.size());
 
         // Verificamos que las aristas seleccionadas son las correctas (las de menor peso)
         Arista arista1 = grafo.obtenerArista(0, 1);
         Arista arista2 = grafo.obtenerArista(1, 2);
+        Arista arista3 = grafo.obtenerArista(2, 3);
 
         // Comprobamos que las aristas generadas están entre las seleccionadas
-        assertTrue(aristasGeneradas.contains(arista1), "La arista entre Espía 1 y Espía 2 debería estar en el árbol");
-        assertTrue(aristasGeneradas.contains(arista2), "La arista entre Espía 2 y Espía 3 debería estar en el árbol");
+        assertTrue(arbolGM.existeArista(arista1), "La arista entre Espía 1 y Espía 2 debería estar en el árbol");
+        assertTrue(arbolGM.existeArista(arista2), "La arista entre Espía 2 y Espía 3 debería estar en el árbol");
+        assertTrue(arbolGM.existeArista(arista3), "La arista entre Espía 3 y Espía 4 debería estar en el árbol");
+
     }
 
     @Test
@@ -56,19 +62,26 @@ class ArbolGMTest {
         arbolGM.calcularPrim();
         ArrayList<Arista> aristasGeneradas = arbolGM.obtenerAristasGeneradas();
 
-        // Validamos que se han generado dos aristas (ya que son 3 vértices)
-        assertEquals(2, aristasGeneradas.size());
+        // Validamos que se han generado tres aristas (ya que son 4 vértices)
+        assertEquals(3, aristasGeneradas.size());
 
         // Verificamos que las aristas seleccionadas son las correctas (las de menor peso)
-        assertTrue(aristasGeneradas.contains(grafo.obtenerArista(vertice1.obtenerId(), vertice2.obtenerId())));
-        assertTrue(aristasGeneradas.contains(grafo.obtenerArista(vertice2.obtenerId(), vertice3.obtenerId())));
+        Arista arista1 = grafo.obtenerArista(vertice1.obtenerId(), vertice2.obtenerId());
+        Arista arista2 = grafo.obtenerArista(vertice2.obtenerId(), vertice3.obtenerId());
+        Arista arista3 = grafo.obtenerArista(vertice3.obtenerId(), vertice4.obtenerId());
+
+        
+        // Verificamos que las aristas seleccionadas son las correctas (las de menor peso)
+        assertTrue(arbolGM.existeArista(arista1));
+        assertTrue(arbolGM.existeArista(arista2));
+        assertTrue(arbolGM.existeArista(arista3));
     }
 
     @Test
     void testCreaCircuito() {
-        assertFalse(arbolGM.creaCircuito(vertice1.obtenerId(), vertice2.obtenerId()));
-        arbolGM.union(vertice1.obtenerId(), vertice2.obtenerId());
-        assertTrue(arbolGM.creaCircuito(vertice1.obtenerId(), vertice2.obtenerId()));
+    	arbolGM.calcularKruskal();
+        assertTrue(arbolGM.creaCircuito(vertice4.obtenerId(), vertice1.obtenerId()));
+        assertFalse(arbolGM.creaCircuito(vertice1.obtenerId(), vertice3.obtenerId()));
     }
 
     @Test

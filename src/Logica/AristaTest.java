@@ -20,23 +20,23 @@ class AristaTest {
         vertice3 = new Vertice(3, "Espía 3");
 
         // Inicializamos las aristas
-        arista1 = new Arista(1, vertice1, vertice2, 50);  // Peso 50
-        arista2 = new Arista(2, vertice2, vertice3, 30);  // Peso 30
+        arista1 = new Arista(1, vertice1, vertice2, 0.5);  // Peso 50
+        arista2 = new Arista(2, vertice2, vertice3, 0.3);  // Peso 30
     }
 
     @Test
     void testConstructor() {
         assertNotNull(arista1);
         assertEquals(1, arista1.obtenerId());
-        assertEquals(50, arista1.obtenerPeso(), "El peso debería ser 50");
+        assertEquals(0.5, arista1.obtenerPeso(), "El peso debería ser 50");
         assertEquals(vertice1, arista1.obtenerOrigen());
         assertEquals(vertice2, arista1.obtenerDestino());
     }
 
     @Test
     void testObtenerPeso() {
-        assertEquals(50, arista1.obtenerPeso(), "El peso debería ser 50");
-        assertEquals(30, arista2.obtenerPeso(), "El peso debería ser 30");
+        assertEquals(0.5, arista1.obtenerPeso(), "El peso debería ser 50");
+        assertEquals(0.3, arista2.obtenerPeso(), "El peso debería ser 30");
     }
 
     @Test
@@ -55,16 +55,16 @@ class AristaTest {
     void testCompareTo() {
         assertTrue(arista1.compareTo(arista2) > 0, "Arista1 debería ser mayor que Arista2 en peso");
         assertTrue(arista2.compareTo(arista1) < 0, "Arista2 debería ser menor que Arista1 en peso");
-        Arista aristaIgualPeso = new Arista(3, vertice1, vertice3, 50); // Peso igual a arista1
+        Arista aristaIgualPeso = new Arista(3, vertice1, vertice3, 0.5); // Peso igual a arista1
         assertEquals(0, arista1.compareTo(aristaIgualPeso), "Deberían ser iguales en peso");
     }
 
     @Test
     void testConstructorPesoInvalido() {
         Exception exception = assertThrows(NumberFormatException.class, () -> {
-            new Arista(3, vertice1, vertice2, 150);  // Peso inválido (fuera de rango)
+            new Arista(3, vertice1, vertice2, 1.5);  // Peso inválido (fuera de rango)
         });
-        assertEquals("El peso debe estar entre 0 y 100", exception.getMessage());
+        assertEquals("El peso debe estar entre 0 y 1.", exception.getMessage());
     }
 
 }
